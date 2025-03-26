@@ -2,32 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lyrics Viewer</title>
+  <title>Song Lyrics</title>
   <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       background: #f4f4f4;
-      padding: 20px;
       margin: 0;
+      padding: 20px;
       color: #333;
     }
     .container {
       max-width: 800px;
-      margin: 40px auto;
+      margin: 0 auto;
       background: #fff;
       padding: 20px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-    h1 {
-      text-align: center;
-      color: #444;
-    }
-    input[type="file"] {
-      display: block;
-      margin: 20px auto;
-    }
     #lyrics {
-      white-space: pre-wrap; /* preserves line breaks and spacing */
+      white-space: pre-wrap; /* preserves formatting like line breaks */
       font-size: 18px;
       line-height: 1.5;
       padding: 10px;
@@ -38,23 +30,24 @@
 </head>
 <body>
   <div class="container">
-    <h1>Lyrics Viewer</h1>
-    <p>Select a .txt file containing your song lyrics to display them in a beautiful format.</p>
-    <input type="file" id="fileInput" accept=".txt">
-    <div id="lyrics"></div>
+    <h1>Song Lyrics</h1>
+    <div id="lyrics">Loading lyrics...</div>
   </div>
-
   <script>
-    document.getElementById('fileInput').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('lyrics').textContent = e.target.result;
-        };
-        reader.readAsText(file);
-      }
-    });
+    // Fetch the lyrics.txt file from the same directory
+    fetch('lyrics.txt')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then(text => {
+        document.getElementById('lyrics').textContent = text;
+      })
+      .catch(error => {
+        document.getElementById('lyrics').textContent = 'Error loading lyrics: ' + error;
+      });
   </script>
 </body>
 </html>
