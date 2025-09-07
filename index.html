@@ -44,11 +44,12 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <main class="container">
     <h1>Song Lyrics</h1>
-    <div id="lyrics">Loading lyrics...</div>
-  </div>
+    <pre id="lyrics" aria-live="polite" aria-busy="true">Loading lyrics...</pre>
+  </main>
   <script>
+    const lyricsElement = document.getElementById('lyrics');
     // Fetch the lyrics.txt file from the same directory
     fetch('lyrics.txt')
       .then(response => {
@@ -58,10 +59,12 @@
         return response.text();
       })
       .then(text => {
-        document.getElementById('lyrics').textContent = text;
+        lyricsElement.textContent = text;
+        lyricsElement.setAttribute('aria-busy', 'false');
       })
       .catch(error => {
-        document.getElementById('lyrics').textContent = 'Error loading lyrics: ' + error;
+        lyricsElement.textContent = 'Error loading lyrics: ' + error;
+        lyricsElement.setAttribute('aria-busy', 'false');
       });
   </script>
 </body>
