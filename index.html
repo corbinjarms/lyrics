@@ -1,71 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Song Lyrics</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #f5f5f7;
-      color: #1d1d1f;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .container {
-      width: 100%;
-      max-width: 800px;
-    }
-    h1 {
-      font-size: 3rem;
-      font-weight: 600;
-      margin: 0 0 24px 0;
-      color: #1d1d1f;
-    }
-    #lyrics {
-      white-space: pre-wrap; /* preserves formatting like line breaks */
-      font-size: 1.25rem;
-      line-height: 1.6;
-    }
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2rem;
-      }
-      #lyrics {
-        font-size: 1rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" id="theme-color">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Song Lyrics</title>
+<style>
+/* VARIABLES */
+:root {
+  --bg:#fafafa;
+  --text:#111;
+  --muted:#555;
+  --accent:#3b82f6;
+  --surface:#fff;
+  --border:rgba(0,0,0,.1);
+  --radius:.5rem;
+  --shadow:0 2px 4px rgba(0,0,0,.1);
+  --font-size:1.125rem;
+  font-size:var(--font-size);
+}
+:root[data-theme="dark"] {
+  --bg:#1b1d1f;
+  --text:#fafafa;
+  --muted:#9ca3af;
+  --accent:#93c5fd;
+  --surface:#26282b;
+  --border:rgba(255,255,255,.1);
+  --shadow:0 2px 4px rgba(0,0,0,.5);
+}
+
+/* GLOBAL */
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height:1.6;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:env(safe-area-inset-bottom);
+  transition:background .3s,color .3s;
+}
+main {
+  max-width:60ch;
+  margin:auto;
+  padding:1rem env(safe-area-inset-right) 3rem env(safe-area-inset-left);
+}
+
+/* LYRICS */
+.line{margin:.25rem 0;padding:.125rem;border-radius:var(--radius);}
+
+/* TOOLBAR */
+header{
+  position:sticky;top:0;z-index:10;background:var(--surface);box-shadow:var(--shadow);
+  padding:calc(.5rem + env(safe-area-inset-top)) .5rem .5rem;
+}
+#bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;max-width:60ch;margin:auto;}
+#bar .title{text-align:left;}
+#bar .title h1{font-size:1.125rem;margin:0;}
+#tools{display:flex;align-items:center;gap:.25rem;}
+#tools button{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:.25rem .5rem;font-size:1rem;color:var(--text);min-width:2.5rem;}
+#tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#search-input{width:0;opacity:0;border:1px solid var(--border);border-radius:var(--radius);padding:.25rem;font-size:1rem;transition:width .3s,opacity .3s;}
+#search-input.open{width:8rem;opacity:1;}
+
+/* FOOTER */
+footer{text-align:center;font-size:.875rem;color:var(--muted);padding:2rem 1rem;}
+
+/* TOAST */
+#toast{position:fixed;bottom:1rem;left:50%;transform:translate(-50%,2rem);background:var(--surface);color:var(--text);padding:.5rem 1rem;border-radius:var(--radius);box-shadow:var(--shadow);opacity:0;transition:opacity .3s,transform .3s;}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+</style>
 </head>
 <body>
-  <main class="container">
-    <h1>Song Lyrics</h1>
-    <pre id="lyrics" aria-live="polite" aria-busy="true">Loading lyrics...</pre>
-  </main>
-  <script>
-    const lyricsElement = document.getElementById('lyrics');
-    // Fetch the lyrics.txt file from the same directory
-    fetch('lyrics.txt')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text();
-      })
-      .then(text => {
-        lyricsElement.textContent = text;
-        lyricsElement.setAttribute('aria-busy', 'false');
-      })
-      .catch(error => {
-        lyricsElement.textContent = 'Error loading lyrics: ' + error;
-        lyricsElement.setAttribute('aria-busy', 'false');
-      });
-  </script>
+<header>
+  <div id="bar">
+    <div class="title">
+      <h1>Song Lyrics</h1>
+    </div>
+    <div id="tools">
+      <button id="fontInc" aria-label="Increase font size">A⁺</button>
+      <button id="fontDec" aria-label="Decrease font size">A⁻</button>
+      <button id="themeToggle" aria-label="Toggle theme">🌓</button>
+      <button id="copy" aria-label="Copy lyrics">⧉</button>
+      <button id="searchToggle" aria-label="Search lyrics">🔍</button>
+      <input id="search-input" type="search" placeholder="Search" aria-label="Search lyrics">
+    </div>
+  </div>
+</header>
+<main>
+  <article id="lyrics" aria-live="polite" aria-busy="true"></article>
+</main>
+<footer>
+  <p>© 2024</p>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const root=document.documentElement;
+const themeColor=document.getElementById('theme-color');
+const fontInc=document.getElementById('fontInc');
+const fontDec=document.getElementById('fontDec');
+const themeToggle=document.getElementById('themeToggle');
+const copy=document.getElementById('copy');
+const searchToggle=document.getElementById('searchToggle');
+function setTheme(t){root.dataset.theme=t;localStorage.setItem('theme',t);themeColor.content=getComputedStyle(root).getPropertyValue('--bg');}
+function setFontSize(v){root.style.setProperty('--font-size',v+'rem');localStorage.setItem('fontSize',v);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+const savedTheme=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+setTheme(savedTheme);
+let size=parseFloat(localStorage.getItem('fontSize'))||1.125;setFontSize(size);
+fontInc.onclick=()=>{size=Math.min(2,size+0.125);setFontSize(size);};
+fontDec.onclick=()=>{size=Math.max(0.875,size-0.125);setFontSize(size);};
+themeToggle.onclick=()=>setTheme(root.dataset.theme==='light'?'dark':'light');
+
+const article=document.getElementById('lyrics');
+fetch('lyrics.txt').then(r=>{if(!r.ok)throw new Error('Network response was not ok');return r.text();}).then(text=>{
+  const linesArr=text.split('\n');
+  linesArr.forEach((line,i)=>{
+    const p=document.createElement('p');
+    p.className='line';
+    p.id='l'+(i+1);
+    p.textContent=line||'';
+    article.appendChild(p);
+  });
+  prepareSearch();
+  article.setAttribute('aria-busy','false');
+}).catch(err=>{
+  article.textContent='Error loading lyrics: '+err;
+  article.setAttribute('aria-busy','false');
+});
+
+copy.onclick=()=>{const clone=article.cloneNode(true);navigator.clipboard.writeText(clone.innerText.trim()).then(()=>showToast('Lyrics copied'));};
+
+const sInput=document.getElementById('search-input');
+searchToggle.onclick=()=>{sInput.classList.toggle('open');if(sInput.classList.contains('open')){sInput.focus();}else{clearSearch();}};
+function clearSearch(){sInput.value='';updateSearch('');}
+let hits=[],hitIndex=0,lines=[];
+function prepareSearch(){
+  lines=[...document.querySelectorAll('.line')];
+  lines.forEach(l=>{l.dataset.html=l.innerHTML;l.dataset.text=l.textContent;});
+}
+function updateSearch(term){
+  lines.forEach(l=>l.innerHTML=l.dataset.html);
+  hits=[];
+  if(!term)return;
+  const reg=new RegExp(term,'gi');
+  lines.forEach(l=>{
+    if(reg.test(l.dataset.text)){
+      l.innerHTML=l.dataset.text.replace(reg,m=>`<mark>${m}</mark>`);
+    }
+  });
+  hits=[...document.querySelectorAll('mark')];
+  hitIndex=0;
+  if(hits.length)focusHit(0);
+}
+function focusHit(i){
+  hits.forEach(h=>h.classList.remove('active-hit'));
+  const m=hits[i];
+  if(m){m.classList.add('active-hit');m.scrollIntoView({behavior:'smooth',block:'center'});}
+}
+sInput.addEventListener('input',e=>updateSearch(e.target.value));
+sInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(!hits.length)return;
+    hitIndex=(hitIndex+1)%hits.length;
+    focusHit(hitIndex);
+  }
+  if(e.key==='Escape'){
+    clearSearch();
+    sInput.classList.remove('open');
+  }
+});
+</script>
 </body>
 </html>
