@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" id="theme-color">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Starlight Avenue – Midnight Assembly</title>
+<style>
+/* VARIABLES */
+:root {
+  --bg:#fafafa;
+  --text:#111;
+  --muted:#555;
+  --accent:#3b82f6;
+  --surface:#fff;
+  --border:rgba(0,0,0,.1);
+  --radius:.5rem;
+  --shadow:0 2px 4px rgba(0,0,0,.1);
+  --font-size:1.125rem;
+  font-size:var(--font-size);
+}
+:root[data-theme="dark"] {
+  --bg:#1b1d1f;
+  --text:#fafafa;
+  --muted:#9ca3af;
+  --accent:#93c5fd;
+  --surface:#26282b;
+  --border:rgba(255,255,255,.1);
+  --shadow:0 2px 4px rgba(0,0,0,.5);
+}
+
+/* GLOBAL */
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height:1.6;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:env(safe-area-inset-bottom);
+  transition:background .3s,color .3s;
+}
+main {
+  max-width:60ch;
+  margin:auto;
+  padding:1rem env(safe-area-inset-right) 3rem env(safe-area-inset-left);
+}
+section {margin:2rem 0;}
+
+/* HEADINGS */
+#title-block h1 {font-size:1.75rem;margin:.5rem 0 0;}
+#title-block .artist {color:var(--muted);margin:0;}
+#title-block .meta {color:var(--muted);font-size:.875rem;margin:.25rem 0 0;}
+article h2 {
+  font-size:1rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--accent);
+  margin:2rem 0 .5rem;
+  position:relative;
+  opacity:0;
+  transform:translateY(.5rem);
+  transition:opacity .6s,transform .6s;
+}
+article h2::after{content:"";display:block;height:1px;background:var(--border);margin-top:.5rem;}
+article h2.visible{opacity:1;transform:none;}
+
+/* LYRICS */
+.line{margin:.25rem 0;padding:.125rem;border-radius:var(--radius);}
+.line.active{background:var(--accent);color:#fff;}
+.line.flash{background:var(--accent);color:#fff;animation:flash 1s forwards;}
+@keyframes flash{from{opacity:1;}to{opacity:0;}}
+
+sup.chord{display:none;color:var(--accent);font-size:.75em;}
+.show-chords sup.chord{display:inline;}
+
+/* TOOLBAR */
+header{
+  position:sticky;top:0;z-index:10;background:var(--surface);box-shadow:var(--shadow);
+  padding:calc(.5rem + env(safe-area-inset-top)) .5rem .5rem;
+}
+#bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;max-width:60ch;margin:auto;}
+#bar .title{text-align:left;}
+#bar .title h1{font-size:1.125rem;margin:0;}
+#bar .title .artist{font-size:.875rem;color:var(--muted);}
+#tools{display:flex;align-items:center;gap:.25rem;}
+#tools button{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:.25rem .5rem;font-size:1rem;color:var(--text);min-width:2.5rem;}
+#tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#scroll-speed{width:5rem;display:none;}
+.autoscrolling #scroll-speed{display:block;}
+#search-input{width:0;opacity:0;border:1px solid var(--border);border-radius:var(--radius);padding:.25rem;font-size:1rem;transition:width .3s,opacity .3s;}
+#search-input.open{width:8rem;opacity:1;}
+
+/* FOOTER */
+footer{text-align:center;font-size:.875rem;color:var(--muted);padding:2rem 1rem;}
+#back-to-top{position:fixed;right:1rem;bottom:1rem;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:var(--radius);padding:.5rem;display:none;}
+.scrolled #back-to-top{display:block;}
+
+/* TOAST */
+#toast{position:fixed;bottom:1rem;left:50%;transform:translate(-50%,2rem);background:var(--surface);color:var(--text);padding:.5rem 1rem;border-radius:var(--radius);box-shadow:var(--shadow);opacity:0;transition:opacity .3s,transform .3s;}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* TOOLTIP */
+.tooltip{position:absolute;top:100%;left:0;background:var(--surface);border:1px solid var(--border);padding:.5rem;border-radius:var(--radius);box-shadow:var(--shadow);white-space:nowrap;}
+.tooltip.hide{display:none;}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+</style>
+</head>
+<body>
+<header>
+  <div id="bar">
+    <div class="title">
+      <h1>Starlight Avenue</h1>
+      <div class="artist">Midnight Assembly</div>
+    </div>
+    <nav id="tools" aria-label="Toolbar">
+      <button id="font-inc" aria-label="Increase font size">A⁺</button>
+      <button id="font-dec" aria-label="Decrease font size">A⁻</button>
+      <button id="theme-toggle" aria-label="Toggle theme">☼</button>
+      <button id="scroll-toggle" aria-label="Autoscroll">▶</button>
+      <input type="range" id="scroll-speed" min="10" max="100" value="40" aria-label="Autoscroll speed">
+      <button id="search-toggle" aria-label="Search">🔍</button>
+      <input id="search-input" type="search" placeholder="Find" aria-label="Search lyrics">
+      <button id="copy" aria-label="Copy lyrics">⧉</button>
+      <button id="chord-toggle" aria-label="Show chords">♭</button>
+    </nav>
+  </div>
+</header>
+<main>
+  <article id="lyrics">
+    <section id="title-block">
+      <h1>Starlight Avenue</h1>
+      <p class="artist">Midnight Assembly</p>
+      <p class="meta"><span>Key: G</span> • <span>BPM: 96</span> • <span>Capo: 2</span></p>
+    </section>
+    <section id="verse1">
+      <h2>Verse 1</h2>
+      <p class="line" id="v1l1"><sup class="chord">G</sup>On the corner of Starlight Avenue</p>
+      <p class="line" id="v1l2">We traced our dreams in <sup class="chord">Em</sup>chalk and dew</p>
+      <p class="line" id="v1l3">The night was young, the <sup class="chord">C</sup>city new</p>
+      <p class="line" id="v1l4">And all the roads led back to <sup class="chord">D</sup>you</p>
+    </section>
+    <section id="chorus">
+      <h2>Chorus</h2>
+      <p class="line" id="c1l1"><sup class="chord">G</sup>Hold tight, the night is falling slow</p>
+      <p class="line" id="c1l2">Let the starlight show the <sup class="chord">D</sup>way</p>
+      <p class="line" id="c1l3">We'll dance until the morning <sup class="chord">Em</sup>glow</p>
+      <p class="line" id="c1l4">And sing the words we dare not <sup class="chord">C</sup>say</p>
+    </section>
+    <section id="bridge">
+      <h2>Bridge</h2>
+      <p class="line" id="b1l1"><sup class="chord">Am</sup>Between the beats our hopes align</p>
+      <p class="line" id="b1l2">A silver thread that we will <sup class="chord">D</sup>find</p>
+    </section>
+    <section id="verse2">
+      <h2>Verse 2</h2>
+      <p class="line" id="v2l1">Beneath the signs and passing <sup class="chord">G</sup>cars</p>
+      <p class="line" id="v2l2">We chased the sound of distant <sup class="chord">Em</sup>bars</p>
+      <p class="line" id="v2l3">In the starlight we <sup class="chord">C</sup>remain</p>
+      <p class="line" id="v2l4">A fleeting spark against the <sup class="chord">D</sup>rain</p>
+    </section>
+    <section id="outro">
+      <h2>Outro</h2>
+      <p class="line" id="o1l1"><sup class="chord">G</sup>The echoes fade, the night is through</p>
+      <p class="line" id="o1l2">But on Starlight Avenue I wait for <sup class="chord">D</sup>you</p>
+    </section>
+  </article>
+</main>
+<footer>
+  <p>© 2024 Midnight Assembly</p>
+  <button id="back-to-top" aria-label="Back to top">↑</button>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* UTILITIES */
+const root=document.documentElement;
+const themeColor=document.getElementById('theme-color');
+function setTheme(t){root.dataset.theme=t;localStorage.setItem('theme',t);themeColor.content=getComputedStyle(root).getPropertyValue('--bg');}
+function setFontSize(v){root.style.setProperty('--font-size',v+'rem');localStorage.setItem('fontSize',v);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+/* INIT */
+const savedTheme=localStorage.getItem('theme')|| (window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+setTheme(savedTheme);
+let size=parseFloat(localStorage.getItem('fontSize'))||1.125;setFontSize(size);
+
+/* TOOLBAR ACTIONS */
+fontInc.onclick=()=>{size=Math.min(2,size+0.125);setFontSize(size);};
+fontDec.onclick=()=>{size=Math.max(0.875,size-0.125);setFontSize(size);};
+themeToggle.onclick=()=>setTheme(root.dataset.theme==='light'?'dark':'light');
+
+/* AUTOSCROLL */
+let scroller=null;const speed=scrollSpeed;scrollToggle.onclick=()=>{if(scroller){clearInterval(scroller);scroller=null;document.body.classList.remove('autoscrolling');scrollToggle.textContent='▶';}else{document.body.classList.add('autoscrolling');scrollToggle.textContent='⏸';scroller=setInterval(()=>window.scrollBy({top:speed.value/10,behavior:'smooth'}),100);}};
+speed.oninput=()=>{};
+
+/* SEARCH */
+const sInput=document.getElementById('search-input');
+searchToggle.onclick=()=>{sInput.classList.toggle('open');if(sInput.classList.contains('open')){sInput.focus();}else{clearSearch();}};
+function clearSearch(){sInput.value='';updateSearch('');}
+let hits=[],hitIndex=0;const lines=[...document.querySelectorAll('.line')];
+lines.forEach(l=>{const clone=l.cloneNode(true);clone.querySelectorAll('.chord').forEach(c=>c.remove());l.dataset.html=l.innerHTML;l.dataset.text=clone.textContent;});
+function updateSearch(term){lines.forEach(l=>l.innerHTML=l.dataset.html);hits=[];if(!term)return;const reg=new RegExp(term,'gi');lines.forEach(l=>{if(reg.test(l.dataset.text)){l.innerHTML=l.dataset.text.replace(reg,m=>`<mark>${m}</mark>`);}});hits=[...document.querySelectorAll('mark')];hitIndex=0;if(hits.length)focusHit(0);}
+function focusHit(i){hits.forEach(h=>h.classList.remove('active-hit'));const m=hits[i];if(m){m.classList.add('active-hit');m.scrollIntoView({behavior:'smooth',block:'center'});}}
+sInput.addEventListener('input',e=>updateSearch(e.target.value));
+sInput.addEventListener('keydown',e=>{if(e.key==='Enter'){if(!hits.length)return;hitIndex=(hitIndex+1)%hits.length;focusHit(hitIndex);}if(e.key==='Escape'){clearSearch();sInput.classList.remove('open');}});
+
+/* COPY */
+copy.onclick=()=>{const clone=document.getElementById('lyrics').cloneNode(true);clone.querySelectorAll('.chord').forEach(c=>c.remove());navigator.clipboard.writeText(clone.innerText.trim()).then(()=>showToast('Lyrics copied'))};
+
+/* CHORD TOGGLE */
+chordToggle.onclick=()=>document.body.classList.toggle('show-chords');
+
+/* LINE HIGHLIGHT */
+lines.forEach(l=>l.addEventListener('click',()=>{l.classList.add('flash');setTimeout(()=>l.classList.remove('flash'),1000);}));
+
+/* HEADING OBSERVER */
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});document.querySelectorAll('article h2').forEach(h=>io.observe(h));
+
+/* CURRENT LINE HIGHLIGHT */
+function updateCurrent(){const center=window.innerHeight/2;let best=null,bestDist=Infinity;lines.forEach(l=>{const r=l.getBoundingClientRect();const d=Math.abs(r.top+r.height/2-center);if(d<bestDist){bestDist=d;best=l;}});lines.forEach(l=>l.classList.toggle('active',l===best));}
+window.addEventListener('scroll',updateCurrent,{passive:true});
+updateCurrent();
+
+/* BACK TO TOP */
+const btt=document.getElementById('back-to-top');window.addEventListener('scroll',()=>{if(window.scrollY>300)document.body.classList.add('scrolled');else document.body.classList.remove('scrolled');});btt.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+/* TOOLTIP */
+if(!localStorage.getItem('tipSeen')){const tip=document.createElement('div');tip.className='tooltip';tip.textContent='Tap A⁺/A⁻ to adjust size';fontInc.appendChild(tip);setTimeout(()=>{tip.classList.add('hide');localStorage.setItem('tipSeen','1');},5000);tip.onclick=()=>{tip.classList.add('hide');localStorage.setItem('tipSeen','1');};}
+
+/* DEEP LINK */
+if(location.hash){const el=document.getElementById(location.hash.substring(1));el&&el.scrollIntoView({behavior:'smooth'});}
+</script>
+</body>
+</html>
