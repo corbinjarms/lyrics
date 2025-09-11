@@ -1,128 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#ffffff" id="theme-color">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#ffffff" id="theme-color" />
 <title>Song Lyrics</title>
 <style>
-/* VARIABLES */
+/* ---------- CSS VARIABLES ---------- */
 :root {
-  --bg:#fafafa;
-  --text:#111;
-  --muted:#555;
-  --accent:#3b82f6;
-  --surface:#fff;
-  --border:rgba(0,0,0,.1);
-  --radius:.5rem;
-  --shadow:0 2px 4px rgba(0,0,0,.1);
-  --font-size:1.125rem;
-  font-size:var(--font-size);
+  --base: 18px; /* adjustable base font size */
+  --lh: calc(var(--base) * 1.75); /* rhythmically scaled line-height */
+  --bg: #fafafa;
+  --text: #111;
+  --muted: #555;
+  --surface: #fff;
+  --border: rgba(0,0,0,.1);
+  --accent: #3b82f6;
+  --accent-bg: rgba(59,130,246,.2);
+  --shadow: 0 2px 4px rgba(0,0,0,.1);
+  font-size: var(--base);
+  line-height: var(--lh);
 }
 :root[data-theme="dark"] {
-  --bg:#1b1d1f;
-  --text:#fafafa;
-  --muted:#9ca3af;
-  --accent:#93c5fd;
-  --surface:#26282b;
-  --border:rgba(255,255,255,.1);
-  --shadow:0 2px 4px rgba(0,0,0,.5);
+  --bg: #1b1d1f;
+  --text: #fafafa;
+  --muted: #9ca3af;
+  --surface: #26282b;
+  --border: rgba(255,255,255,.1);
+  --accent: #93c5fd;
+  --accent-bg: rgba(147,197,253,.2);
+  --shadow: 0 2px 4px rgba(0,0,0,.5);
 }
 
-/* GLOBAL */
+/* ---------- GLOBAL STYLES ---------- */
+html { scroll-behavior: smooth; }
 body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  line-height:1.6;
-  -webkit-tap-highlight-color:transparent;
-  padding-bottom:env(safe-area-inset-bottom);
-  transition:background .3s,color .3s;
+  margin: 0;
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  transition: background .3s, color .3s;
 }
 main {
-  max-width:60ch;
-  margin:auto;
-  padding:1rem env(safe-area-inset-right) 3rem env(safe-area-inset-left);
+  max-width: 60ch;
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
 }
 
-/* LYRICS */
-.line{margin:.25rem 0;padding:.125rem;border-radius:var(--radius);}
-.title{margin:1.5rem 0 .5rem;font-weight:bold;text-align:center;}
-
-/* TOOLBAR */
-header{
-  position:sticky;top:0;z-index:10;background:var(--surface);box-shadow:var(--shadow);
-  padding:calc(.5rem + env(safe-area-inset-top)) .5rem .5rem;
+/* ---------- LYRICS ---------- */
+.lyric {
+  margin: 0.45rem 0;
+  letter-spacing: 0.1px;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  transition: background .3s;
 }
-#bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;max-width:60ch;margin:auto;}
-#bar .title{text-align:left;}
-#bar .title h1{font-size:1.125rem;margin:0;}
-#tools{display:flex;align-items:center;gap:.25rem;}
-#tools button{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:.25rem .5rem;font-size:1rem;color:var(--text);min-width:2.5rem;}
-#tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.line-flash { background: var(--accent-bg); }
+.song-title, .artist { text-align: center; }
+.song-title {
+  margin: 1.5rem 0 0.75rem;
+  font-weight: 800;
+}
+.artist {
+  margin: 0 0 2rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.section {
+  margin: 2rem 0 1rem;
+  text-align: center;
+  font-weight: 800;
+  text-wrap: balance;
+  position: relative;
+}
+.section::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin: 10px auto 0;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  border-radius: 2px;
+}
 
-/* FOOTER */
-footer{text-align:center;font-size:.875rem;color:var(--muted);padding:2rem 1rem;}
+/* ---------- APP BAR ---------- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: calc(0.5rem + env(safe-area-inset-top)) 1rem 0.5rem;
+  transition: box-shadow .2s;
+}
+header.scrolled { box-shadow: var(--shadow); }
+#bar {
+  max-width: 60ch;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+#bar h1 {
+  font-size: 1rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#tools { display: flex; gap: 0.25rem; }
+.btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.btn:hover,
+.btn:active { background: var(--accent); color: var(--bg); }
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
+/* ---------- BACK TO TOP FAB ---------- */
+#fab {
+  position: fixed;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  right: calc(1rem + env(safe-area-inset-right));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+#fab.show { opacity: 1; pointer-events: auto; }
+#fab:focus-visible {
+  outline: 2px solid var(--border);
+  outline-offset: 2px;
+}
 
+h2, .song-title { scroll-margin-top: calc(56px + env(safe-area-inset-top)); }
 
-@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
 </style>
 </head>
 <body>
 <header>
   <div id="bar">
-    <div class="title">
-      <h1>Song Lyrics</h1>
-    </div>
+    <h1>Song Lyrics</h1>
     <div id="tools">
-      <button id="fontInc" aria-label="Increase font size">A⁺</button>
-      <button id="fontDec" aria-label="Decrease font size">A⁻</button>
-      <button id="themeToggle" aria-label="Toggle theme">🌓</button>
+      <button id="fontInc" class="btn" aria-label="Increase text size">A+</button>
+      <button id="fontDec" class="btn" aria-label="Decrease text size">A–</button>
+      <button id="themeToggle" class="btn" aria-label="Toggle theme" aria-pressed="false">🌓</button>
     </div>
   </div>
 </header>
 <main>
   <article id="lyrics" aria-live="polite" aria-busy="true"></article>
 </main>
-<footer>
-  <p>© 2024</p>
-</footer>
+<button id="fab" aria-label="Back to top">↑</button>
 <script>
-const root=document.documentElement;
-const themeColor=document.getElementById('theme-color');
-const fontInc=document.getElementById('fontInc');
-const fontDec=document.getElementById('fontDec');
-const themeToggle=document.getElementById('themeToggle');
-function setTheme(t){root.dataset.theme=t;localStorage.setItem('theme',t);themeColor.content=getComputedStyle(root).getPropertyValue('--bg');}
-function setFontSize(v){root.style.setProperty('--font-size',v+'rem');localStorage.setItem('fontSize',v);}
-const savedTheme=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-setTheme(savedTheme);
-let size=parseFloat(localStorage.getItem('fontSize'))||1.125;setFontSize(size);
-fontInc.onclick=()=>{size=Math.min(2,size+0.125);setFontSize(size);};
-fontDec.onclick=()=>{size=Math.max(0.875,size-0.125);setFontSize(size);};
-themeToggle.onclick=()=>setTheme(root.dataset.theme==='light'?'dark':'light');
+const root = document.documentElement;
+const themeColor = document.getElementById('theme-color');
+const inc = document.getElementById('fontInc');
+const dec = document.getElementById('fontDec');
+const themeBtn = document.getElementById('themeToggle');
+const fab = document.getElementById('fab');
+const header = document.querySelector('header');
+const article = document.getElementById('lyrics');
 
-const article=document.getElementById('lyrics');
-fetch('lyrics.txt').then(r=>{if(!r.ok)throw new Error('Network response was not ok');return r.text();}).then(text=>{
-  const linesArr=text.split('\n');
-  linesArr.forEach((line,i)=>{
-    const isTitle=line.startsWith('#');
-    const el=document.createElement(isTitle?'h2':'p');
-    el.className=isTitle?'line title':'line';
-    el.id='l'+(i+1);
-    el.textContent=isTitle?line.replace(/^#+\s*/, ''):line||'';
-    article.appendChild(el);
+function applyTheme(t) {
+  root.dataset.theme = t;
+  themeBtn.setAttribute('aria-pressed', t === 'dark');
+  themeColor.content = getComputedStyle(root).getPropertyValue('--bg').trim();
+  localStorage.setItem('theme', t);
+}
+function applyFont(size) {
+  root.style.setProperty('--base', size + 'px');
+  root.style.setProperty('--lh', size * 1.75 + 'px');
+  localStorage.setItem('base', size);
+}
+let base = parseInt(localStorage.getItem('base')) || 18;
+base = Math.min(22, Math.max(17, base));
+applyFont(base);
+const savedTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+applyTheme(savedTheme);
+inc.addEventListener('click', () => { if (base < 22) { base++; applyFont(base); } });
+dec.addEventListener('click', () => { if (base > 17) { base--; applyFont(base); } });
+themeBtn.addEventListener('click', () => applyTheme(root.dataset.theme === 'light' ? 'dark' : 'light'));
+
+// Scroll handling
+let scrolling = false;
+function onScroll() {
+  if (scrolling) return;
+  scrolling = true;
+  requestAnimationFrame(() => {
+    const y = window.scrollY;
+    header.classList.toggle('scrolled', y > 24);
+    fab.classList.toggle('show', y > window.innerHeight);
+    scrolling = false;
   });
-  article.setAttribute('aria-busy','false');
-}).catch(err=>{
-  article.textContent='Error loading lyrics: '+err;
-  article.setAttribute('aria-busy','false');
-});
+}
+document.addEventListener('scroll', onScroll, { passive: true });
+
+fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// Fetch and render lyrics
+fetch('lyrics.txt')
+  .then(r => r.text())
+  .then(text => {
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
+    lines.forEach(line => {
+      if (line.startsWith('# ')) {
+        const h1 = document.createElement('h1');
+        h1.className = 'song-title';
+        h1.textContent = line.slice(2).trim();
+        article.appendChild(h1);
+      } else if (line.startsWith('## ')) {
+        const h2 = document.createElement('h2');
+        h2.className = 'artist';
+        h2.textContent = line.slice(3).trim();
+        article.appendChild(h2);
+      } else if (/^\[.*\]$/.test(line)) {
+        const h2 = document.createElement('h2');
+        h2.className = 'section';
+        h2.textContent = line.slice(1, -1).trim();
+        article.appendChild(h2);
+      } else if (line.trim() === '') {
+        const spacer = document.createElement('div');
+        spacer.style.height = 'var(--lh)';
+        article.appendChild(spacer);
+      } else {
+        const p = document.createElement('p');
+        p.className = 'lyric';
+        p.textContent = line;
+        p.addEventListener('click', () => {
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          p.classList.add('line-flash');
+          setTimeout(() => p.classList.remove('line-flash'), 250);
+        });
+        article.appendChild(p);
+      }
+    });
+    article.setAttribute('aria-busy', 'false');
+  })
+  .catch(err => {
+    article.textContent = 'Error loading lyrics: ' + err;
+    article.setAttribute('aria-busy', 'false');
+  });
 </script>
 </body>
 </html>
