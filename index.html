@@ -51,6 +51,7 @@ main {
 
 /* LYRICS */
 .line{margin:.25rem 0;padding:.125rem;border-radius:var(--radius);}
+.title{margin:1.5rem 0 .5rem;font-weight:bold;text-align:center;}
 
 /* TOOLBAR */
 header{
@@ -110,11 +111,12 @@ const article=document.getElementById('lyrics');
 fetch('lyrics.txt').then(r=>{if(!r.ok)throw new Error('Network response was not ok');return r.text();}).then(text=>{
   const linesArr=text.split('\n');
   linesArr.forEach((line,i)=>{
-    const p=document.createElement('p');
-    p.className='line';
-    p.id='l'+(i+1);
-    p.textContent=line||'';
-    article.appendChild(p);
+    const isTitle=line.startsWith('#');
+    const el=document.createElement(isTitle?'h2':'p');
+    el.className=isTitle?'line title':'line';
+    el.id='l'+(i+1);
+    el.textContent=isTitle?line.replace(/^#+\s*/, ''):line||'';
+    article.appendChild(el);
   });
   article.setAttribute('aria-busy','false');
 }).catch(err=>{
