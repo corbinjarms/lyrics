@@ -1,4 +1,4 @@
-#Prelude
+# Prelude
 
 
 All creatures of our God and King,
@@ -17,7 +17,7 @@ Alleluia, alleluia, alleluia.
 
 
 
-#Psalm 145
+# Psalm 145
 
 
 
@@ -92,7 +92,7 @@ O let all that lives ever bless His name!
 
 
 
-#And Can It Be
+# And Can It Be
 
 
 
@@ -200,7 +200,7 @@ and earth repeat the loud amen.
 
 
 
-#Doxology
+# Doxology
 Praise God, from whom all blessings flow;
 Praise Him, all creatures here below;
 Praise Him above, ye heav'nly host;
