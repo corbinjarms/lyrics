@@ -1,4 +1,4 @@
-Prelude
+#Prelude
 
 
 All creatures of our God and King,
@@ -17,7 +17,7 @@ Alleluia, alleluia, alleluia.
 
 
 
-Psalm 145
+#Psalm 145
 
 
 
@@ -92,13 +92,13 @@ O let all that lives ever bless His name!
 
 
 
-And Can It Be
+#And Can It Be
 
 
 
 And can it be that I should gain
 
-An int'rest in the Savior's blood?
+An interest in the Savior's blood?
 
 Died He for me, who caused His pain?
 
@@ -160,7 +160,7 @@ And claim the crown, through Christ my own.
 
 
 
-Jesus Shall Reign
+#Jesus Shall Reign
 
 Jesus shall reign where'er the sun
 
@@ -200,4 +200,9 @@ and earth repeat the loud amen.
 
 
 
-Doxology
+#Doxology
+Praise God, from whom all blessings flow;
+Praise Him, all creatures here below;
+Praise Him above, ye heav'nly host;
+Praise Father, Son, and Holy Ghost.
+Amen.
